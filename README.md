@@ -14,7 +14,7 @@ Test Server is an express Web server for:
         * Run `nano .bash_profile` 
         * Add: 
             > `#Practitest` 
-            > `export PRACTITEST_KEY=abd4494fea037b960ac249d84cf176fc3226c33b `
+            > `export PRACTITEST_KEY=(Get Key From Paul or Walter)`
         * Save `Control + X`
         * Restart Terminal
 * Install Visual Studio Code (Recommended)
