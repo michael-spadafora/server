@@ -1,0 +1,19 @@
+{
+    "env": {
+      "node": true
+    },
+    "parserOptions": {
+        "ecmaVersion": 8,
+        "ecmaFeatures": {
+          "globalReturn": true,
+          "experimentalObjectRestSpread": true
+        }
+    },
+    "rules": {
+        "semi": [ "warn", "never" ],
+        "eqeqeq": ["warn", "always"],
+        "no-unused-vars": ["warn"],
+        "no-use-before-define": ["warn"],
+        "no-var": ["warn"]
+    }
+}
