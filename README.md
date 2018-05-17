@@ -13,8 +13,8 @@ Test Server is an express Web server for:
     * On OSX Terminal:
         * Run `nano .bash_profile` 
         * Add: 
-            > #Practitest
-            > export PRACTITEST_KEY=(Get Key From Paul or Walter)
+            > ```#Practitest
+            > export PRACTITEST_KEY=(Get Key From Paul or Walter)```
         * Save `Control + X`
         * Restart Terminal
 * Install Visual Studio Code (Recommended)
