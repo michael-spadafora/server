@@ -39,7 +39,7 @@ class projectController {
      */
     getTestSets (projectId) {
         return runSafePromise(async () => {
-            const res = await Practitest.getTestSets(projectId)
+            const res = await Practitest.getTestSets(projectId) //this is one single item
             const data = []
 
             for (let i = 0; i< res.data.length; i ++) {

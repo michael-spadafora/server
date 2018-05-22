@@ -9,12 +9,12 @@ const { runSafePromise } = require('../utils/runSafe')
  */
 class Practitest {
 
-    constructor(){
+    constructor(){  
         this.email = 'pscala@ips-yes.com'
-        this.key = process.env.PRACTITEST_KEY
+        this.key = process.env.PRACTITEST_KEY //gets key from environment 
         this.url = 'https://api.practitest.com/api/v2/'
     
-        this.auth = new Buffer.from(this.email + ':' + this.key).toString('base64')
+        this.auth = new Buffer.from(this.email + ':' + this.key).toString('base64') //verifies our username with our key
     
         this.api = axios.create({
             baseURL: this.url,
