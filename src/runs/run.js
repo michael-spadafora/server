@@ -24,7 +24,7 @@ class Run {
             }
         }
 
-        if (isAutomatedID === null) {
+        if (isAutomatedID === "") {
             this.hasAutomatedTests = false
         }
         else {
@@ -62,11 +62,13 @@ class Run {
             this.automatedIndex = 0
     }
     
-    
+    /**
+     * returns the next test, or -1 if there are none. not to be used with getNextAutomatedTest()
+     */
     getNextTest() {
         return runSafePromise(async () => {
             if (this.tests.index+1 === this.tests.length) {
-                return null
+                return -1
             }
 
             this.index = this.index+1
@@ -74,10 +76,13 @@ class Run {
         })
     }   
 
+    /**
+     * returns the next automated test, or -1 if there are none. not to be used with getNextTest()
+     */
     getNextAutomatedTest() {
         return runSafePromise(async () => {
             if (this.automatedTests.automatedIndex+1 === this.automatedTests.length){
-                return null
+                return -1
             }
 
             this.automatedIndex = this.automatedIndex+1
@@ -85,30 +90,48 @@ class Run {
         })
     }   
 
+    /**
+     * returns all tests
+     */
     getAllTests() {
         return this.tests
     }
 
-    getAutomatedTestsO() {
+    /**
+     * returns all automated tests
+     */
+    getAutomatedTests() {
         return this.automatedTests
 
     }
 
+    /**
+     * returns all the automated tests which have not been executed
+     */
     getautomatedTestsRemaining() {
         return this.automatedTests.slice(this.automatedIndex)
     }
 
+    /**
+     * returns the completed tests
+     */
     getautomatedTestsCompleted() {
         return this.automatedTests.slice(0, this.automatedIndex)
     }
 
+    /**
+     * returns the tests remaining
+     */
     getTestsRemaining() {
         return this.tests.slice(this.index)
     }
 
+    /**
+     * returns all completed tests
+     */
     getTestsCompleted() {
         return this.tests.slice(0, this.index)
     }
 
 }
-module.exports = new Run()
+module.exports = Run
