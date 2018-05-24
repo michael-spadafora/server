@@ -87,6 +87,24 @@ class WorkerController {
         return allMatches
     }
 
+    getAllAvailableWorkers(){
+        let avWorkers = []
+        for (let i = 0; i < this.workers.length; i++){
+            if (this.workers[i].isFree === true){
+                avWorkers.push(this.workers[i])
+            }
+        }
+        return avWorkers
+    }
+
+    getAllWorkers(){
+        let avWorkers = []
+        for (let i = 0; i < this.workers.length; i++){
+                avWorkers.push(this.workers[i])
+        }
+        return avWorkers
+    }
+
     /**
      * returns the worker corresponding to the id number sent 
      * @param {*} id the id number of the worker which is desired

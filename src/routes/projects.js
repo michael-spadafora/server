@@ -13,4 +13,9 @@ router.get('/:id/testsets', asyncHandler(async(req, res) => {
     res.json(projects)
 }))
 
+router.get('/:projectID/testsets/:testsetID/instances/', asyncHandler(async(req, res) => {
+    const instances = await projectController.getTestSetInstances(req.params.testsetID,req.params.projectID)
+    res.json(instances)
+}))
+
 module.exports = router
