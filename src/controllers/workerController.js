@@ -1,4 +1,3 @@
-
 class WorkerController {
     constructor(){
         this.workers = []
@@ -11,19 +10,21 @@ class WorkerController {
      * @param {*} infos the capabilites of the worker to be set
      * @returns the ID number
      */
-    addWorker(os, infos){
+    addWorker(os, infos) {
         //puts a new worker in the first available spot in the array
         // return runSafePromise(async () => {
             let capabilities = []
             for (let i  = 0; i < infos.length; i++) {
                 capabilities.push(infos[i].name)
             }
+            let arr = []
             let worker = {
                 id:this.nextID, 
                 os: os,
                 capabilities: capabilities,
                 isFree: true,
-                socket: null
+                socket: null,
+                runControllers: arr
             }
 
             for (let i = 0 ;  i < this.workers.length; i++) { //skips over this if empty
@@ -39,12 +40,11 @@ class WorkerController {
     }
 
     /**
-     * returns first free worker which matches specs sent to it. blocks if workers match specs, but not free. returns -1 if no workers match specs available
-     * currently breaks if the match disconnects while this is waiting for it
+     * depricated
      * @returns the ID of the first free worker which matches specs sent to it, or -1 if none are available
      */
-    //TODO: UPDATE TO MAKE ASYNC
-    assignWorker(info){ 
+    
+    assignWorker(info) { 
         // return runSafePromise(async () => {
             while (true) {
                 let allMatches = this.getAllMatchingWorkers(info) //might need to set timeout
@@ -69,7 +69,7 @@ class WorkerController {
      * @param {*} os the operating system required to run this test
      * @param {*} capabilities the capabilities which are required to run this test
      */
-    getAllMatchingWorkers(os,capabilities){
+    getAllMatchingWorkers(os,capabilities) {
         let info = []
 
         for (let i = 0; i< capabilities.length; i++) {
@@ -87,7 +87,10 @@ class WorkerController {
         return allMatches
     }
 
-    getAllAvailableWorkers(){
+    /**
+     * @returns all workers that have their "isfree" field as true
+     */
+    getAllAvailableWorkers() {
         let avWorkers = []
         for (let i = 0; i < this.workers.length; i++){
             if (this.workers[i].isFree === true){
@@ -97,7 +100,10 @@ class WorkerController {
         return avWorkers
     }
 
-    getAllWorkers(){
+     /**
+     * @returns all workers
+     */
+    getAllWorkers() {
         let avWorkers = []
         for (let i = 0; i < this.workers.length; i++){
                 avWorkers.push(this.workers[i])
@@ -109,7 +115,7 @@ class WorkerController {
      * returns the worker corresponding to the id number sent 
      * @param {*} id the id number of the worker which is desired
      */
-    getWorker(id){
+    getWorker(id) {
             let idnum = parseInt(id)
         for (let i = 0 ; i < this.workers.length; i++) {
             if (idnum === this.workers[i].id) { 
@@ -123,7 +129,7 @@ class WorkerController {
      * @param {*} id the id of the worker corresponding to the socket to be set
      * @param {*} socket the socket which should be stored in the worker with id of id
      */
-    setWorkerSocket(id, socket){
+    setWorkerSocket(id, socket) {
         let idnum = parseInt(id)
 
         for (let i = 0 ; i < this.workers.length; i++){
@@ -136,11 +142,23 @@ class WorkerController {
 
     }
 
+    sendTest(test) {  
+        this.workerisFree = false
+        let item  = {
+            id: test.id,
+            script: test.script,
+            parameters: test.parameters
+            
+        }
+        socket.emit('nextTest', item)
+    }
+
     /**
      * frees a worker, making them available for future work
      * @param {number} idnum the id number of the worker to be freed
      */
-    freeWorker(idnum){ //sets a worker as freed
+    //add in a call to get workers now
+    freeWorker(idnum) { //sets a worker as freed
         for (let i = 0 ; i < this.workers.length; i++) {
             if (this.workers[i].id === idnum)
                 this.workers[i].isFree = true
@@ -148,17 +166,33 @@ class WorkerController {
         }
     }
     /**
-     * removes a worker from the array of available workers
+     * removes a worker from the array of available workers, and from the designated workers of the runController
      * @param {number} idnum the number of the worker to be removed
      */
-    removeWorker(idnum){ //removes a worker from the array
+    removeWorker(idnum) { //removes a worker from the array
         idnum = parseInt(idnum)
         for (let i = 0 ; i < this.workers.length; i++) {
             if (this.workers[i].id === idnum) {
+                
+                for (let j = 0; j < this.workers[j].runControllers.length;j++){ 
+                    this.workers[i].runControllers[j].removeDesignatedWorker(idnum)
+                }
+
                 this.workers.splice(i,1)
                 return idnum
             } 
         }
+    }
+
+    /**
+     * attaches a Worker and a RunController to each other
+     * @param {} workerID 
+     * @param {*} runCont 
+     */
+    attachRunControllerToWorker(workerID, runCont) {
+        let worker = this.getWorker(workerID)
+        runCont.designatedWorkers.push(worker)
+        worker.runControllers.push(runCont)
     }
 }
 module.exports = new WorkerController()

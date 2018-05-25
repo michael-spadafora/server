@@ -4,27 +4,52 @@ const workerController = require('./workerController')
 const Run = require('../runs/run')
 
 class RunController {
-    constructor (projectID, testSetID){
+
+    constructor (projectID, testSetID) {
         this.run = new Run(projectID, testSetID)
+        this.designatedWorkers = []
     }
 
-    runAllAutomatedTests() {
-        let nextTest = this.run.getNextAutomatedTest
-        while (nextTest !== -1) {
-            // let nextTest = this.run.getNextAutomatedTest //has id, parameters, script
-            worker = workerController.assignWorker([]) //no info for now. change [] to real info when ready
-            //todo: wait until current test is done
-            nextTest = this.run.getNextAutomatedTest
-            if (worker === -1 ) {
-                continue 
+    removeDesignatedWorker(idnum) {
+        for(let i = 0; i < this.designatedWorkers.length; i++){
+            if (this.designatedWorkers[i].id === idnum){
+                this.designatedWorkers.splice[i,1]
             }
-            worker.attach(nextTest)
-        } 
+        }
     }
 
+    runTest(){
+        if (this.designatedWorkers.length !== 1) {
+            runTestsAuto()
+        }
+        else {
+            sendTestsWithWorker()
+        }
+    }
 
-    //we will need to use our workercontroller to schedule runs of specific tests
-    //
+    runTestsAuto(){
+        /**
+         * TODO
+         */
+    }
+
+    /**
+     * 
+     */
+    sendTestsWithWorker() {
+        let test = this.run.getNextAutomatedTest()
+        if (test === -1){
+            return test
+        }
+        let item  = {
+            id: test.id,
+            script: test.script,
+            parameters: test.parameters
+        }
+        
+        let socket = this.designatedWorkers[0].socket
+        socket.emit('nextTest', item)
+    }
 }
 
 module.exports = RunController

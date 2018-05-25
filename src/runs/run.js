@@ -1,16 +1,27 @@
 const Practitest = require('../practitestApi/practitest')
 
-class Run {
+class Run { //has tests
     
     constructor(projectID,testSetID){
         this.projectID = projectID 
         this.testset = testSetID
+        this.worker = -1 //may have a designated worker
 
+        let automatedAndAllTests = retrieveTests(projectID, testSetID)
+
+        this.automatedTests = automatedAndAllTests[0]
+        this.tests = automatedAndAllTests[1]
+
+        this.index = 0 
+        this.automatedIndex = 0
+    }
+
+    retrieveTests(projectID, testSetID){
         let customFields = Practitest.getCustomFields(projectID)
-
         let isAutomatedID = ""
         let scriptID = ""
         let argsID = ""
+        let hasAutomatedTests = ""
         
         for (let i = 0; i < customFields.data.length; i++) {
             if (customFields.data[i].attributes.name === 'Automated') {
@@ -25,41 +36,38 @@ class Run {
         }
 
         if (isAutomatedID === "") {
-            this.hasAutomatedTests = false
+            hasAutomatedTests = false
         }
         else {
-            this.hasAutomatedTests = true  
+            hasAutomatedTests = true  
         } 
 
+        isAutomatedID = "---f-" + isAutomatedID
+        // use  ---f-customfieldnumber  "yes and no" in quotes
+        let allTests = Practitest.getTestSetInstances(projectID, testSetID)
 
+        let tests = []
+        let automatedTests = []
 
-        // if (this.hasAutomatedTests){
-            isAutomatedID = "---f-" + isAutomatedID
-            // use  ---f-customfieldnumber  "yes and no" in quotes
-            let allTests = Practitest.getTestSetInstances(projectID, testSetID)
-
-            this.tests = []
-            this.automatedTests = []
-
-            for (let i = 0; i < allTests.data.length; i++) {
-                let currTestID = allTests.data[i].testid
-                let currTest = Practitest.getTest(projectID, currTestID)
-                if (this.hasAutomatedTests && currTest.attributes['custom-fields'][isAutomatedID] === "yes") { //checks if test is automated
-                    this.automatedTests.push({ //pushes automated tests
-                        id: currTestID,
-                        script: currTest.attributes['custom-fields'][scriptID],
-                        parameters: currTest.attributes['custom-fields'][argsID]
-                    })
-                }
-                this.tests.push({ //pushes everything, regardless of if its automated or not
-                    id: currTestID,
-                    script: currTest.attributes['custom-fields'][scriptID],
-                    parameters: currTest.attributes['custom-fields'][argsID]
-                })
+        for (let i = 0; i < allTests.data.length; i++) {
+            let currTestID = allTests.data[i].testid``
+            let currTest = Practitest.getTest(projectID, currTestID)
+            let item = {
+                id: currTestID,
+                script: currTest.attributes['custom-fields'][scriptID],
+                parameters: currTest.attributes['custom-fields'][argsID]
             }
+            if (hasAutomatedTests && currTest.attributes['custom-fields'][isAutomatedID] === "yes") { //checks if test is automated
+                automatedTests.push(item)
+            }
+            tests.push(item)
+        }
 
-            this.index = 0 
-            this.automatedIndex = 0
+        let ret = []
+        ret.push(automatedTests)
+        ret.push(tests)
+
+        return ret
     }
     
     /**
@@ -80,14 +88,13 @@ class Run {
      * returns the next automated test, or -1 if there are none. not to be used with getNextTest()
      */
     getNextAutomatedTest() {
-        return runSafePromise(async () => {
             if (this.automatedTests.automatedIndex+1 === this.automatedTests.length){
                 return -1
             }
 
             this.automatedIndex = this.automatedIndex+1
             return this.automatedTests[this.automatedIndex-1]
-        })
+        
     }   
 
     /**
@@ -102,7 +109,6 @@ class Run {
      */
     getAutomatedTests() {
         return this.automatedTests
-
     }
 
     /**
@@ -131,6 +137,10 @@ class Run {
      */
     getTestsCompleted() {
         return this.tests.slice(0, this.index)
+    }
+
+    setDesignatedWorker(worker){
+        this.worker = worker
     }
 
 }
