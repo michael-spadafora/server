@@ -5,7 +5,7 @@ class SocketController{
         this.socket = socket
         this.nextRunId = 0
     }
-
+    
     setupSocket() {
         let socket = this.socket
         let idnum = socket.handshake.query['id']
@@ -21,6 +21,11 @@ class SocketController{
         let worker = workerController.getWorker(idnum)
         // console.log(worker)
         if(typeof worker !== 'undefined') {
+            if (worker.socket !== null){
+                console.log("id number " + idnum + " is in use")
+                return
+            }
+            
             socket.to('clients').emit('newWorker', worker) //tells all clients that a new worker has registered
             workerController.setWorkerSocket(idnum, socket)
             

@@ -1,6 +1,6 @@
 // i will be receiving the project id and test set id
 
-const workerController = require('./workerController')
+
 const Run = require('../runs/run')
 
 class RunController {
@@ -39,6 +39,10 @@ class RunController {
     sendTestsWithWorker() {
         let test = this.run.getNextAutomatedTest()
         if (test === -1){
+            //for all workers, remove this from workers
+            for (let i = 0; i < this.designatedWorkers.length; i++){
+                removeRunController(this, this.designatedWorkers[i])
+            }
             return test
         }
         let item  = {

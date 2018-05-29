@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const RateLimit = require('express-rate-limit')
 const api = require('./routes/api')
-const workerController = require('./controllers/workerController')
+
 const socketController = require('./controllers/socketController')
 
 //Variables

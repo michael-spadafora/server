@@ -1,3 +1,4 @@
+const Worker = require('../worker/worker')
 class WorkerController {
     constructor(){
         this.workers = []
@@ -11,21 +12,11 @@ class WorkerController {
      * @returns the ID number
      */
     addWorker(os, infos) {
-        //puts a new worker in the first available spot in the array
-        // return runSafePromise(async () => {
             let capabilities = []
             for (let i  = 0; i < infos.length; i++) {
                 capabilities.push(infos[i].name)
             }
-            let arr = []
-            let worker = {
-                id:this.nextID, 
-                os: os,
-                capabilities: capabilities,
-                isFree: true,
-                socket: null,
-                runControllers: arr
-            }
+            let worker = new Worker(this.nextID, os, capabilities)
 
             for (let i = 0 ;  i < this.workers.length; i++) { //skips over this if empty
                 if (this.workers[i].isDefunct) {
@@ -36,7 +27,6 @@ class WorkerController {
 
             this.workers.push(worker)
             return this.nextID++ //this will be the worker's id, starting at 0
-        // })
     }
 
     /**
@@ -194,5 +184,6 @@ class WorkerController {
         runCont.designatedWorkers.push(worker)
         worker.runControllers.push(runCont)
     }
+
 }
 module.exports = new WorkerController()

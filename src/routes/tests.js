@@ -8,7 +8,7 @@ router.get('/', asyncHandler(async(req, res) => {
     let tests = []
 
     for (let i = 0; i < workers.length; i++){
-        tests.push(workers[i].)
+        tests.push(workers[i].runControllers)
     }
 
     const projects = await projectController.getProjects()
